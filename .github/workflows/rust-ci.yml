@@ -25,7 +25,7 @@ jobs:
             name: x86_64-macos-rustdsplit
             path: target/x86_64-apple-darwin/release/rustdsplit
           - type: windows-x64
-            os: windows-latest-x64
+            os: windows-latest
             target: x86_64-pc-windows-msvc
             name: x86_64-windows-rustdsplit.exe
             path: target\x86_64-pc-windows-msvc\release\rustdsplit.exe
