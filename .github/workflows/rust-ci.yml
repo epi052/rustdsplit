@@ -11,6 +11,9 @@ jobs:
         target:
           - x86_64-unknown-linux-musl
           - i686-unknown-linux-musl
+        name:
+          - x86_64-static-linux-rustdsplit
+          - x86-static-linux-rustdsplit
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -23,33 +26,31 @@ jobs:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }}
-      - shell: bash
-        run: |
-          ls -alR
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.target }}-rustdsplit
+          name: ${{ matrix.name }}
           path: target/${{ matrix.target }}/release/rustdsplit
 
   build-macos:
     name: Build MacOS
     runs-on: macOS-latest
-    strategy:
-      matrix:
-        target:
-          - x86_64-apple-darwin
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: ${{ matrix.target }}
+          target: x86_64-apple-darwin
           override: true
       - uses: actions-rs/cargo@v1
         with:
           use-cross: true
           command: build
-          args: --release --target=${{ matrix.target }}
+          args: --release --target=x86_64-apple-darwin
+      - uses: actions/upload-artifact@v2
+        with:
+          name: x86_64-macos-rustdsplit
+          path: target/x86_64-apple-darwin/release/rustdsplit
+
   build-windows:
     name: Build Windows
     runs-on: windows-latest
@@ -58,6 +59,9 @@ jobs:
         target:
           - x86_64-pc-windows-msvc
           - i686-pc-windows-msvc
+        name:
+          - x86_64-windows-rustdsplit.exe
+          - x86-windows-rustdsplit.exe
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -70,3 +74,7 @@ jobs:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.name }}
+          path: target/${{ matrix.target }}/release/rustdsplit
