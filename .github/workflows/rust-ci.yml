@@ -74,6 +74,9 @@ jobs:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }}
+      - shell: cmd
+        run: |
+          dir /a /s /b
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.name }}
