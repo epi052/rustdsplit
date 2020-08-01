@@ -23,7 +23,9 @@ jobs:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }}
-          run: ls -alR
+      - shell: bash
+        run: |
+          ls -alR
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target }}-rustdsplit
