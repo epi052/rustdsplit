@@ -3,17 +3,32 @@ on: [push]
 name: Cross-compile
 
 jobs:
-  build-linux:
-    name: Build Linux
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        target:
-          - x86_64-unknown-linux-musl
-          - i686-unknown-linux-musl
-        name:
-          - x86_64-static-linux-rustdsplit
-          - x86-static-linux-rustdsplit
+        os: [ubuntu-latest, ubuntu-latest, macos-latest, windows-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            name: x86_64-linux-rustdsplit
+            path: target/x86_64-unknown-linux-musl/release/rustdsplit
+          - os: ubuntu-latest
+            target: i686-unknown-linux-musl
+            name: x86-linux-rustdsplit
+            path: target/i686-unknown-linux-musl/release/rustdsplit
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            name: x86_64-macos-rustdsplit
+            path: target/x86_64-apple-darwin/release/rustdsplit
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            name: x86_64-windows-rustdsplit.exe
+            path: target\x86_64-pc-windows-msvc\release\rustdsplit.exe
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            name: x86-windows-rustdsplit.exe
+            path: target\i686-pc-windows-msvc\release\rustdsplit.exe
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -29,55 +44,5 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.name }}
-          path: target/${{ matrix.target }}/release/rustdsplit
+          path: ${{ matrix.path }}
 
-  build-macos:
-    name: Build MacOS
-    runs-on: macOS-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: x86_64-apple-darwin
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --target=x86_64-apple-darwin
-      - uses: actions/upload-artifact@v2
-        with:
-          name: x86_64-macos-rustdsplit
-          path: target/x86_64-apple-darwin/release/rustdsplit
-
-  build-windows:
-    name: Build Windows
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        target:
-          - x86_64-pc-windows-msvc
-          - i686-pc-windows-msvc
-        name:
-          - x86_64-windows-rustdsplit.exe
-          - x86-windows-rustdsplit.exe
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --target=${{ matrix.target }}
-      - shell: cmd
-        run: |
-          dir /a /s /b
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.name }}
-          path: target/${{ matrix.target }}/release/rustdsplit
