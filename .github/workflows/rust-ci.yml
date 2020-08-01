@@ -23,6 +23,11 @@ jobs:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.target }}-rustdsplit
+          path: /project/rustdsplit
+
   build-macos:
     name: Build MacOS
     runs-on: macOS-latest
