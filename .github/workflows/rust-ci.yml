@@ -24,13 +24,32 @@ name: Cross-compile
 
 jobs:
   build-linux:
-    name: Build
+    name: Build Linux
     runs-on: ubuntu-latest
     strategy:
       matrix:
         target:
           - x86_64-unknown-linux-musl
           - i686-unknown-linux-musl
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target=${{ matrix.target }}
+  build-macos:
+    name: Build MacOS
+    runs-on: macOS-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-apple-darwin
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
