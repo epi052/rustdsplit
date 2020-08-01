@@ -26,7 +26,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target }}-rustdsplit
-          path: /project/target/release/rustdsplit
+          path: /project
 
   build-macos:
     name: Build MacOS
