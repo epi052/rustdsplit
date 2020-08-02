@@ -102,12 +102,8 @@ jobs:
           command: build
           args: --release --target=${{ matrix.target }}
       - uses: actions/upload-artifact@v2
+        if: contains(github.ref, "master")
         with:
           name: ${{ matrix.name }}
           path: ${{ matrix.path }}
-      - uses: svenstaro/upload-release-action@v1-release
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ matrix.path }}
-          asset_name: ${{ matrix.name }}
-          tag: ${{ github.event.client_payload.new_version }}
+
