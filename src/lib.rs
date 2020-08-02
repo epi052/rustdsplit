@@ -221,44 +221,40 @@ impl SplitFile {
 
     fn save(&self) {
         let leftname = self.filename(SplitHalf::Left);
-        println!("{} {}", "[=]".bright_blue(), "Saving first half");
+        println!("{} Saving first half", "[=]".bright_blue());
 
         match fs::write(
             &leftname,
             [&self.left_sig.as_bytes(), self.data(SplitHalf::Left)].concat(),
         ) {
             Ok(_d) => println!(
-                "{} {} {}",
+                "{} Successfully saved {}",
                 "[+]".bright_green(),
-                "Successfully saved",
                 leftname
             ),
             Err(e) => println!(
-                "{} {} {}: {}",
+                "{} Could not save {}: {}",
                 "[!]".bright_red(),
-                "Could not save",
                 leftname,
                 e
             ),
         }
 
         let rightname = self.filename(SplitHalf::Right);
-        println!("{} {}", "[=]".bright_blue(), "Saving second half");
+        println!("{} Saving second half", "[=]".bright_blue());
 
         match fs::write(
             &rightname,
             [&self.right_sig.as_bytes(), self.data(SplitHalf::Right)].concat(),
         ) {
             Ok(_d) => println!(
-                "{} {} {}",
+                "{} Successfully saved {}",
                 "[+]".bright_green(),
-                "Successfully saved",
                 rightname
             ),
             Err(e) => println!(
-                "{} {} {}: {}",
+                "{} Could not save {}: {}",
                 "[!]".bright_red(),
-                "Could not save",
                 leftname,
                 e
             ),
@@ -273,33 +269,29 @@ pub fn run(args: &Cli) -> Result<(), Box<dyn error::Error>> {
     let right = split.data(SplitHalf::Right);
 
     if left.len() + right.len() != split.size {
-        eprintln!("{} {}", "[!]".bright_red(), "Incomplete file read");
+        eprintln!("{} Incomplete file read", "[!]".bright_red());
         process::exit(1);
     }
 
-    match split.read_signature() {
-        Some(sig) => {
-            println!(
-                "{} {} {}",
-                "[=]".bright_blue(),
-                "Found a previously split file with signature:",
-                sig,
-            );
+    if let Some(sig) = split.read_signature() {
+        println!(
+            "{} Found a previously split file with signature: {}",
+            "[=]".bright_blue(),
+            sig,
+        );
 
-            let halfway = (sig.end_offset - sig.start_offset) / 2;
-            let middle = sig.start_offset + halfway;
+        let halfway = (sig.end_offset - sig.start_offset) / 2;
+        let middle = sig.start_offset + halfway;
 
-            split.set_signature(sig.start_offset, middle, SplitHalf::Left);
-            split.set_signature(middle, sig.end_offset, SplitHalf::Right);
-        }
-        None => {
-            println!(
-                "{} {}",
-                "[=]".bright_blue(),
-                "No signature found; commencing the first split of a pristine file!"
-            );
-        }
-    };
+        split.set_signature(sig.start_offset, middle, SplitHalf::Left);
+        split.set_signature(middle, sig.end_offset, SplitHalf::Right);
+    }
+    else {
+        println!(
+            "{} No signature found; commencing the first split of a pristine file!",
+            "[=]".bright_blue()
+        );
+    }
 
     split.save();
 

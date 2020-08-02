@@ -1,6 +1,6 @@
-on: [push]
-
 name: CI Pipeline
+
+on: [push]
 
 jobs:
   check:
@@ -16,6 +16,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: check
+
   test:
     name: Test Suite
     runs-on: ubuntu-latest
@@ -30,116 +31,34 @@ jobs:
         with:
           command: test
 
-#   fmt:
-#     name: Rustfmt
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v2
-#       - uses: actions-rs/toolchain@v1
-#         with:
-#           profile: minimal
-#           toolchain: stable
-#           override: true
-#       - run: rustup component add rustfmt
-#       - uses: actions-rs/cargo@v1
-#         with:
-#           command: fmt
-#           args: --all -- --check
-
-#   clippy:
-#     name: Clippy
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v2
-#       - uses: actions-rs/toolchain@v1
-#         with:
-#           profile: minimal
-#           toolchain: stable
-#           override: true
-#       - run: rustup component add clippy
-#       - uses: actions-rs/cargo@v1
-#         with:
-#           command: clippy
-#           args: -- -D clippy::all -D clippy::pedantic -D warnings
-
-  release:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          Changes in this Release
-          - First Change
-          - Second Change
-        draft: false
-        prerelease: false
-
-
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        type: [linux-x64, linux-x86, mac, windows-x64, windows-x86]
-        include:
-          - type: linux-x64
-            os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            name: x86_64-linux-rustdsplit
-            path: target/x86_64-unknown-linux-musl/release/rustdsplit
-          - type: linux-x86
-            os: ubuntu-latest
-            target: i686-unknown-linux-musl
-            name: x86-linux-rustdsplit
-            path: target/i686-unknown-linux-musl/release/rustdsplit
-          - type: mac
-            os: macos-latest
-            target: x86_64-apple-darwin
-            name: x86_64-macos-rustdsplit
-            path: target/x86_64-apple-darwin/release/rustdsplit
-          - type: windows-x64
-            os: windows-latest
-            target: x86_64-pc-windows-msvc
-            name: x86_64-windows-rustdsplit.exe
-            path: target\x86_64-pc-windows-msvc\release\rustdsplit.exe
-          - type: windows-x86
-            os: windows-latest
-            target: i686-pc-windows-msvc
-            name: x86-windows-rustdsplit.exe
-            path: target\i686-pc-windows-msvc\release\rustdsplit.exe
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --release --target=${{ matrix.target }}
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.name }}
-          path: ${{ matrix.path }}
-      - name: Upload Release Asset
-#         if: startsWith(github.ref, 'refs/tags/v')
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ${{ matrix.path }}
-          asset_name: ${{ matrix.name }}
-          asset_content_type: application/zip
-
+#  fmt:
+#    name: Rustfmt
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions-rs/toolchain@v1
+#        with:
+#          profile: minimal
+#          toolchain: stable
+#          override: true
+#      - run: rustup component add rustfmt
+#      - uses: actions-rs/cargo@v1
+#        with:
+#          command: fmt
+#          args: --all -- --check
+#
+#  clippy:
+#    name: Clippy
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions-rs/toolchain@v1
+#        with:
+#          profile: minimal
+#          toolchain: stable
+#          override: true
+#      - run: rustup component add clippy
+#      - uses: actions-rs/cargo@v1
+#        with:
+#          command: clippy
+#          args: -- -D clippy::all -D clippy::pedantic -D warnings
