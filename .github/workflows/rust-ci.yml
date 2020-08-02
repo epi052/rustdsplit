@@ -102,7 +102,7 @@ jobs:
           command: build
           args: --release --target=${{ matrix.target }}
       - uses: actions/upload-artifact@v2
-        if: contains(github.ref, "master")
+        if: github.ref == 'refs/heads/master'
         with:
           name: ${{ matrix.name }}
           path: ${{ matrix.path }}
