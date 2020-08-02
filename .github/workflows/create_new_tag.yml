@@ -18,6 +18,6 @@ jobs:
       - name: Repository dispatch tag created event
         uses: peter-evans/repository-dispatch@v1
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.auto-release-token }}
           event-type: tag-created
           client-payload: '{"new_version": "${{ steps.bump_version.outputs.new_tag }}"}'
