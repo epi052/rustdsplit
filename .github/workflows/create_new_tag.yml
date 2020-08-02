@@ -17,9 +17,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
+          RELEASE_BRANCHES: add*, master
       - name: Repository dispatch tag created event
         uses: peter-evans/repository-dispatch@v1
         with:
-          token: ${{ secrets.auto-release-token }}
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
           event-type: tag-created
           client-payload: '{"new_version": "${{ steps.bump_version.outputs.new_tag }}"}'
