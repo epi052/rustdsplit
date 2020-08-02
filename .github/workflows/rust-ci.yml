@@ -64,7 +64,23 @@ jobs:
           args: -- -D clippy::all -D clippy::pedantic -D warnings
 
   build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: x86_64-unknown-linux-musl
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target=x86_64-unknown-linux-musl
+
+  build-all:
     runs-on: ${{ matrix.os }}
+    if: github.ref == 'refs/heads/master'
     strategy:
       matrix:
         os: [ubuntu-latest, ubuntu-latest, macos-latest, windows-latest, windows-latest]
@@ -102,7 +118,6 @@ jobs:
           command: build
           args: --release --target=${{ matrix.target }}
       - uses: actions/upload-artifact@v2
-        if: github.ref == 'refs/heads/master'
         with:
           name: ${{ matrix.name }}
           path: ${{ matrix.path }}
